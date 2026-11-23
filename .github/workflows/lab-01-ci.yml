@@ -1,0 +1,28 @@
+name: Lab 01 Linux Monitor CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-01-linux-monitor/**"
+      - ".github/workflows/lab-01-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-01-linux-monitor/**"
+      - ".github/workflows/lab-01-ci.yml"
+
+jobs:
+  test-health-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stage-01-junior-devops/lab-01-linux-monitor
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run health check tests
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/test_health_check.sh

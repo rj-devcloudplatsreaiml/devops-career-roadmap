@@ -1,0 +1,20 @@
+---
+- name: Configure baseline runtime directory and MOTD
+  hosts: app_nodes
+  gather_facts: false
+  vars:
+    runtime_dir: /tmp/rj-platform-runtime
+    banner_text: "Managed by Ansible - Baseline Configuration Active\n"
+
+  tasks:
+    - name: Ensure runtime directory exists
+      ansible.builtin.file:
+        path: "{{ runtime_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Write baseline status file
+      ansible.builtin.copy:
+        content: "{{ banner_text }}"
+        dest: "{{ runtime_dir }}/status.txt"
+        mode: "0644"

@@ -1,0 +1,34 @@
+name: Lab 08 Ansible Config CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-02-mid-level-devops/lab-08-ansible-config-management/**"
+      - ".github/workflows/lab-08-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-02-mid-level-devops/lab-08-ansible-config-management/**"
+      - ".github/workflows/lab-08-ci.yml"
+
+jobs:
+  ansible-validation:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stage-02-mid-level-devops/lab-08-ansible-config-management
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install ansible-core
+
+      - name: Syntax check playbook
+        run: ansible-playbook -i inventory/hosts.ini playbooks/baseline.yml --syntax-check
+
+      - name: Dry-run check mode
+        run: ansible-playbook -i inventory/hosts.ini playbooks/baseline.yml --check

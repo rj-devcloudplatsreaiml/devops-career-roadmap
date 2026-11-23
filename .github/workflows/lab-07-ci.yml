@@ -1,0 +1,29 @@
+name: Lab 07 CI/CD Pipeline Automation
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-02-mid-level-devops/lab-07-ci-cd-pipeline-automation/**"
+      - ".github/workflows/lab-07-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-02-mid-level-devops/lab-07-ci-cd-pipeline-automation/**"
+      - ".github/workflows/lab-07-ci.yml"
+
+jobs:
+  pipeline-gates:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stage-02-mid-level-devops/lab-07-ci-cd-pipeline-automation
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Shell syntax check
+        run: bash -n scripts/check_release_manifest.sh
+
+      - name: Validate release manifest gate
+        run: ./scripts/check_release_manifest.sh checkout-service 1.4.2

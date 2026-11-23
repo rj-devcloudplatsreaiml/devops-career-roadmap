@@ -1,0 +1,47 @@
+name: Lab 06 Terraform Modules CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-02-mid-level-devops/lab-06-terraform-modules-finops/**"
+      - ".github/workflows/lab-06-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-02-mid-level-devops/lab-06-terraform-modules-finops/**"
+      - ".github/workflows/lab-06-ci.yml"
+
+jobs:
+  validate-modules-and-envs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Format check across Lab 06
+        working-directory: stage-02-mid-level-devops/lab-06-terraform-modules-finops
+        run: terraform fmt -check -recursive
+
+      - name: Validate reusable module
+        working-directory: stage-02-mid-level-devops/lab-06-terraform-modules-finops/modules/tagged-storage
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate dev environment
+        working-directory: stage-02-mid-level-devops/lab-06-terraform-modules-finops/envs/dev
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate prod environment
+        working-directory: stage-02-mid-level-devops/lab-06-terraform-modules-finops/envs/prod
+        run: |
+          terraform init -backend=false
+          terraform validate

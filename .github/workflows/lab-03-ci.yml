@@ -1,0 +1,37 @@
+name: Lab 03 Terraform CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-03-terraform-aws/**"
+      - ".github/workflows/lab-03-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-03-terraform-aws/**"
+      - ".github/workflows/lab-03-ci.yml"
+
+jobs:
+  terraform-validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stage-01-junior-devops/lab-03-terraform-aws
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init (No Backend)
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate

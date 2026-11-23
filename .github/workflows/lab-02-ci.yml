@@ -1,0 +1,34 @@
+name: Lab 02 Docker Service CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-02-docker-service/**"
+      - ".github/workflows/lab-02-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-02-docker-service/**"
+      - ".github/workflows/lab-02-ci.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stage-01-junior-devops/lab-02-docker-service
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t lab-02-docker-service:ci .
+
+      - name: Run container smoke test
+        run: |
+          docker run -d --name lab-02-ci -p 8080:8080 -e APP_ENV=ci lab-02-docker-service:ci
+          sleep 2
+          curl -sf http://localhost:8080/health | grep -q "ok"
+          curl -sf http://localhost:8080/ >/dev/null
+          docker rm -f lab-02-ci

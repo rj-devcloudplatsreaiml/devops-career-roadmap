@@ -1,0 +1,25 @@
+name: Junior DevOps Lab 02 Docker CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t lab-02-docker-service:ci .
+
+      - name: Run container and smoke test
+        run: |
+          docker run -d --name test-web -p 8080:8080 lab-02-docker-service:ci
+          sleep 3
+          curl -fsS http://localhost:8080/health
+          curl -fsS http://localhost:8080/
+          docker rm -f test-web

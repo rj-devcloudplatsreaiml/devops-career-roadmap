@@ -8,3 +8,4 @@ Structured hands-on DevOps and cloud engineering labs organized by stage, with p
 - `stage-01-junior-devops/lab-02-docker-service` — Containerized Python Flask service with Docker Compose and smoke-test CI
 - `stage-01-junior-devops/lab-03-terraform-aws` — Terraform AWS S3 artifact bucket with encryption, versioning, and validation CI
 - `stage-01-junior-devops/lab-04-kubernetes-manifests` — Kubernetes Namespace, ConfigMap, Deployment, and Service validated with `kubeconform`
+- `stage-01-junior-devops/lab-05-observability-stack` — Hybrid Prometheus, Grafana, Node Exporter, and Datadog Agent observability stack with CI validation

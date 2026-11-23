@@ -1,0 +1,46 @@
+name: Lab 05 Observability CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-05-observability-stack/**"
+      - ".github/workflows/lab-05-ci.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "stage-01-junior-devops/lab-05-observability-stack/**"
+      - ".github/workflows/lab-05-ci.yml"
+
+jobs:
+  validate-observability:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stage-01-junior-devops/lab-05-observability-stack
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose syntax (default and datadog profiles)
+        run: |
+          docker compose config -q
+          docker compose --profile datadog config -q
+
+      - name: Validate YAML syntax for Prometheus, Grafana, and Datadog configs
+        run: |
+          python3 -c '
+          import glob, yaml
+          for path in glob.glob("**/*.yml", recursive=True) + glob.glob("**/*.yaml", recursive=True):
+              with open(path) as f:
+                  yaml.safe_load(f)
+              print(f"Valid YAML: {path}")
+          '
+
+      - name: Validate Prometheus config and alert rules with promtool
+        run: |
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "$PWD/prometheus:/etc/prometheus:ro" \
+            prom/prometheus:v2.55.1 \
+            check config /etc/prometheus/prometheus.yml

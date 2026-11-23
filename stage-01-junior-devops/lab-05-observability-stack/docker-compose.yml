@@ -1,0 +1,66 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: lab05-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: lab05-node-exporter
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: lab05-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: lab05-datadog-agent
+    profiles:
+      - datadog
+    environment:
+      - DD_API_KEY=${DD_API_KEY:-dummy_ci_key}
+      - DD_SITE=${DD_SITE:-datadoghq.com}
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_APM_ENABLED=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_CONTAINER_EXCLUDE="name:lab05-datadog-agent"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - ./datadog/datadog.yaml:/etc/datadog-agent/datadog.yaml:ro
+      - ./datadog/conf.d/docker.d/conf.yaml:/etc/datadog-agent/conf.d/docker.d/conf.yaml:ro
+    ports:
+      - "8126:8126"
+      - "8125:8125/udp"
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:

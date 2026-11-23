@@ -1,0 +1,10 @@
+site: datadoghq.com
+logs_enabled: true
+apm_config:
+  enabled: true
+process_config:
+  process_collection:
+    enabled: true
+tags:
+  - env:dev
+  - project:devops-junior-lab-05

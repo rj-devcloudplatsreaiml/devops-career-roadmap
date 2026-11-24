@@ -1,0 +1,13 @@
+service: checkout-api
+owner: platform-sre
+window: 30d
+slos:
+  - name: availability
+    sli: "ratio of HTTP non-5xx responses to total valid HTTP requests"
+    target: 99.9
+    error_budget_percent: 0.1
+    allowed_downtime_minutes_30d: 43.2
+  - name: latency_p95
+    sli: "fraction of valid HTTP requests served in <= 250ms"
+    target: 99.0
+    error_budget_percent: 1.0

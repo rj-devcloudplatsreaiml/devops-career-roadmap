@@ -1,0 +1,34 @@
+groups:
+  - name: checkout-api-slo-alerts
+    rules:
+      - alert: CheckoutHighErrorBudgetBurnFast
+        expr: |
+          (
+            sum(rate(http_requests_total{service="checkout-api",status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{service="checkout-api"}[5m]))
+          ) > (14.4 * 0.001)
+        for: 2m
+        labels:
+          severity: page
+          service: checkout-api
+          runbook: runbooks/high-5xx-burn-rate.md
+        annotations:
+          summary: "Fast error budget burn on checkout-api (14.4x 1h/5m)"
+          description: "5xx error rate exceeds 1.44% over 5m; 2% of 30d budget burns in 1 hour."
+
+      - alert: CheckoutHighErrorBudgetBurnSlow
+        expr: |
+          (
+            sum(rate(http_requests_total{service="checkout-api",status=~"5.."}[30m]))
+            /
+            sum(rate(http_requests_total{service="checkout-api"}[30m]))
+          ) > (6 * 0.001)
+        for: 15m
+        labels:
+          severity: ticket
+          service: checkout-api
+          runbook: runbooks/high-5xx-burn-rate.md
+        annotations:
+          summary: "Sustained error budget burn on checkout-api (6x 6h/30m)"
+          description: "5xx error rate exceeds 0.6% over 30m; 5% of 30d budget burns in 6 hours."

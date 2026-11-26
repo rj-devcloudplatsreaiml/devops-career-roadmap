@@ -1,0 +1,5 @@
+RUNBOOK-K8S-04: CrashLoopBackOff Mitigation
+1. Check pod exit code and recent events using kubectl describe pod <pod-name> -n prod.
+2. Inspect previous container logs with kubectl logs <pod-name> -n prod --previous.
+3. If exit code is 137 (OOMKilled), raise memory limit in deployment values from 512Mi to 1Gi and roll out safely.
+4. Never delete PersistentVolumeClaims during pod restarts.
